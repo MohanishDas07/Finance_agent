@@ -171,7 +171,12 @@ def detect_and_project_recurrence(
             from dateutil.relativedelta import relativedelta
             import dataclasses
             
-            last_date = filtered_dates[-1] if filtered_dates else dates[-1]
+            # Check if there is a scheduled or amended event with a later date
+            scheduled_dates = [x[0] for x in items if x[1].status in ('scheduled', 'confirmed')]
+            if scheduled_dates and max(scheduled_dates) > (filtered_dates[-1] if filtered_dates else dates[-1]):
+                last_date = max(scheduled_dates)
+            else:
+                last_date = filtered_dates[-1] if filtered_dates else dates[-1]
             if cadence_months:
                 next_date = last_date + relativedelta(months=1)
             else:

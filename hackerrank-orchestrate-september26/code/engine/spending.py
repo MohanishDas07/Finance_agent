@@ -117,13 +117,15 @@ def solve_spending_changes(
             # Simulate this combination
             # We add the savings to the daily balances and check if min_balance is met.
             sim_balances = dict(simulator.daily_balances)
+            last_pay = max(d for d, _ in payment_schedule) if payment_schedule else simulator.request.request_date
+            end_date = max(last_pay, simulator.request.desired_completion_date)
             
             # First, apply the payment schedule
             for p_date, p_amt in payment_schedule:
                 d = p_date
-                end_date = simulator.request.request_date + timedelta(days=simulator.forecast_days)
                 while d <= end_date:
-                    sim_balances[d] -= p_amt
+                    if d in sim_balances:
+                        sim_balances[d] -= p_amt
                     d += timedelta(days=1)
                     
             # Now apply the savings
@@ -131,13 +133,13 @@ def solve_spending_changes(
                 for occ_date, occ_amt, occ_min in act['occurrences']:
                     saving = occ_amt if act['type'] == 'stop' else (occ_amt - occ_min)
                     d = occ_date
-                    end_date = simulator.request.request_date + timedelta(days=simulator.forecast_days)
                     while d <= end_date:
                         if d in sim_balances:
                             sim_balances[d] += saving
                         d += timedelta(days=1)
                         
-            if min(sim_balances.values()) >= simulator.profile.minimum_balance_to_keep:
+            relevant_bals = [sim_balances[d] for d in sim_balances if d <= end_date]
+            if min(relevant_bals) >= simulator.profile.minimum_balance_to_keep:
                 # We found a valid combination!
                 # Format the output strings
                 changes = []
@@ -155,3 +157,4 @@ def solve_spending_changes(
                 return changes
                 
     return []
+

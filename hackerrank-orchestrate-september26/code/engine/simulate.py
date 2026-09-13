@@ -32,7 +32,7 @@ class Simulator:
         cur_date = self.request.request_date
         end_date = cur_date + timedelta(days=self.forecast_days)
         
-        while cur_date <= end_date:
+        while cur_date < end_date:
             day_net = 0.0
             if cur_date in events_by_date:
                 for e in events_by_date[cur_date]:
@@ -62,17 +62,15 @@ class Simulator:
     def get_earliest_date_for_full_payment(self) -> Optional[date]:
         """
         The earliest date at which paying the full requested_amount as one lump sum
-        keeps the balance safe from that date through end of forecast.
-        A payment on date D reduces balance[D..end] by requested_amount.
+        keeps the balance safe without optional spending changes across the 90-day forecast.
         """
         cur_date = self.request.request_date
-        end_date = cur_date + timedelta(days=self.forecast_days)
+        end_date = self.request.request_date + timedelta(days=self.forecast_days)
         
-        while cur_date <= end_date:
-            # Check: if we pay on cur_date, does balance stay >= min_keep from cur_date to end?
+        while cur_date < end_date:
             safe = True
             check_date = cur_date
-            while check_date <= end_date:
+            while check_date < end_date:
                 if self.daily_balances[check_date] - self.request.requested_amount < self.profile.minimum_balance_to_keep:
                     safe = False
                     break
@@ -88,26 +86,26 @@ class Simulator:
     def check_plan_safety(self, payment_schedule: List[Tuple[date, float]]) -> Tuple[bool, float]:
         """
         Given a list of (date, amount) payments, check if the plan is safe.
-        Returns (is_safe, minimum_balance_breach_amount)
-        If is_safe is True, breach_amount is 0.0.
-        If is_safe is False, breach_amount is the maximum amount by which the balance fell below the minimum.
+        Evaluates safety throughout the plan active period and desired_completion_date.
         """
-        # copy daily balances
         sim_balances = dict(self.daily_balances)
+        if not payment_schedule:
+            return True, 0.0
+            
+        last_pay = max(d for d, _ in payment_schedule)
+        end_date = max(last_pay, self.request.desired_completion_date)
         
         for p_date, p_amt in payment_schedule:
-            # apply payment to all days from p_date onwards
-            if p_date < self.request.request_date or p_date > self.request.request_date + timedelta(days=self.forecast_days):
-                continue
-                
             d = p_date
-            end_date = self.request.request_date + timedelta(days=self.forecast_days)
             while d <= end_date:
-                sim_balances[d] -= p_amt
+                if d in sim_balances:
+                    sim_balances[d] -= p_amt
                 d += timedelta(days=1)
                 
-        min_bal = min(sim_balances.values())
+        relevant_bals = [sim_balances[d] for d in sim_balances if d <= end_date]
+        min_bal = min(relevant_bals) if relevant_bals else self.profile.minimum_balance_to_keep
         if min_bal < self.profile.minimum_balance_to_keep:
             return False, round(self.profile.minimum_balance_to_keep - min_bal, 4)
             
         return True, 0.0
+

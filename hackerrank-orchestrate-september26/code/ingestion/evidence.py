@@ -119,6 +119,22 @@ class EvidenceExtractor:
                     new_date=None,
                     description=None
                 ))
+            elif "komisi" in text.lower() and ("belum disetujui" in text.lower() or "tidak masuk" in text.lower()):
+                facts.append(ExtractedFact(
+                    action='cancel_commission',
+                    event_id=None,
+                    new_amount=None,
+                    new_date=None,
+                    description='commission'
+                ))
+                if amt:
+                    facts.append(ExtractedFact(
+                        action='amend_salary_amount',
+                        event_id=None,
+                        new_amount=amt,
+                        new_date=dt,
+                        description='salary'
+                    ))
             elif "naik menjadi" in text.lower() or "gaji" in text.lower() or "salary" in text.lower() or "pay is" in text.lower() or "reduced to" in text.lower() or "first salary" in text.lower():
                 facts.append(ExtractedFact(
                     action='amend_salary_amount',
@@ -180,6 +196,11 @@ def apply_evidence_to_ledger(
                 for e in events:
                     if e.user_id == m.user_id and 'bonus' in (e.description or '').lower():
                         e.status = 'cancelled'
+            elif f.action == 'cancel_commission':
+                for e in events:
+                    if e.user_id == m.user_id and 'commission' in (e.description or '').lower():
+                        e.status = 'cancelled'
+                        e.description = (e.description or '') + ' cancelled'
             elif f.action == 'cancel_transfer':
                 user_evs = [e for e in events if e.user_id == m.user_id]
                 for e1 in user_evs:
@@ -201,6 +222,8 @@ def apply_evidence_to_ledger(
                         if not last_sal or e.event_date > last_sal.event_date:
                             last_sal = e
                 if last_sal:
+                    last_sal.status = 'cancelled'
+                    last_sal.description = (last_sal.description or '') + ' replaced date'
                     kwargs = dataclasses.asdict(last_sal)
                     kwargs['event_id'] = f"amended_sal_date_{m.message_id}"
                     kwargs['event_date'] = dt
@@ -211,7 +234,7 @@ def apply_evidence_to_ledger(
             elif f.action == 'amend_salary_amount' and f.new_amount:
                 last_sal = None
                 for e in events:
-                    if e.user_id == m.user_id and e.category == 'salary':
+                    if e.user_id == m.user_id and e.category == 'salary' and e.status != 'cancelled' and 'commission' not in (e.description or '').lower():
                         if not last_sal or e.event_date > last_sal.event_date:
                             last_sal = e
                 if last_sal:
