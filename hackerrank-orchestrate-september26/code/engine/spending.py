@@ -48,12 +48,12 @@ def solve_spending_changes(
             
         # Can we stop it?
         can_stop = False
-        if e.flexibility == 'stoppable' and e.category in simulator.profile.expense_categories_user_is_willing_to_stop:
+        if e.flexibility in ('stoppable', 'reducible_or_stoppable') and e.category in simulator.profile.expense_categories_user_is_willing_to_stop:
             can_stop = True
             
         # Can we reduce it?
         can_reduce = False
-        if e.flexibility == 'reducible' and e.category in simulator.profile.expense_categories_user_is_willing_to_reduce:
+        if e.flexibility in ('reducible', 'reducible_or_stoppable') and e.category in simulator.profile.expense_categories_user_is_willing_to_reduce:
             can_reduce = True
             
         if not can_stop and not can_reduce:
@@ -148,7 +148,10 @@ def solve_spending_changes(
                         # For reduce, we must specify the new amount.
                         # We use the minimum_allowed_amount of the first occurrence
                         new_amt = act['occurrences'][0][2]
-                        changes.append(f"reduce_to:{act['root_id']}:{new_amt}")
+                        if abs(new_amt - round(new_amt)) < 1e-5:
+                            changes.append(f"reduce_to:{act['root_id']}:{int(round(new_amt))}")
+                        else:
+                            changes.append(f"reduce_to:{act['root_id']}:{new_amt:.2f}")
                 return changes
                 
     return []

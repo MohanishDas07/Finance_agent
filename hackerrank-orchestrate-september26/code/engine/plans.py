@@ -21,10 +21,10 @@ class Plan:
         res = []
         for d, amt in self.schedule:
             amt_round = round(amt, 4)
-            if amt_round.is_integer():
-                res.append(f"{d.strftime('%Y-%m-%d')}:{int(amt_round)}")
+            if abs(amt_round - round(amt_round)) < 1e-5:
+                res.append(f"{d.strftime('%Y-%m-%d')}:{int(round(amt_round))}")
             else:
-                res.append(f"{d.strftime('%Y-%m-%d')}:{amt_round}")
+                res.append(f"{d.strftime('%Y-%m-%d')}:{amt_round:.2f}")
         return "|".join(res)
         
     def format_spending_changes(self) -> str:
@@ -156,17 +156,12 @@ def generate_and_rank_plans(
         
     # Ranking logic
     if not candidates:
-        # Fallback
-        affordability = "not_affordable"
-        if earliest_date_full:
-            affordability = "affordable_later"
-            
         return (
-            amount_safe_to_pay,
-            affordability,
+            round(amount_safe_to_pay, 4),
+            "not_affordable",
             "not_recommended",
             "none",
-            earliest_date_full.strftime('%Y-%m-%d') if earliest_date_full else "",
+            "",
             "none"
         )
         

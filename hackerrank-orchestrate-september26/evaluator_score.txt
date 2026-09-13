@@ -1,0 +1,69 @@
+[PASS] request_01
+[FAIL] request_02
+  Expected: 17229139.2, affordable_with_plan, installments, 2025-08-08:15952906.67|2025-09-07:15952906.67|2025-10-07:15952906.67, 2025-09-15, none
+  Got:      20027194.03, affordable_with_plan, installments, 2025-08-08:15952906.67|2025-09-07:15952906.67|2025-10-07:15952906.67, 2025-09-15, none
+[FAIL] request_03
+  Expected: 873000.0, affordable_later, wait, 2019-11-15:5491000, 2019-11-15, none
+  Got:      1084203.09, affordable_later, wait, 2019-11-15:5491000, 2019-11-15, none
+[FAIL] request_04
+  Expected: 8401800.0, affordable_later, wait, 2024-06-15:12693000, 2024-06-15, none
+  Got:      10283912.78, affordable_later, wait, 2024-06-15:12693000, 2024-06-15, none
+[FAIL] request_05
+  Expected: 737.0, not_affordable, not_recommended, none, , none
+  Got:      0.0, not_affordable, not_recommended, none, , none
+[FAIL] request_06
+  Expected: 603.3, affordable_with_plan, full_payment, 2026-01-03:620.40, 2026-01-15, stop:event_476
+  Got:      518.45, affordable_later, wait, 2026-01-15:620.4, 2026-01-15, none
+[FAIL] request_07
+  Expected: 87170.56, affordable_with_plan, installments, 2024-09-12:68432|2024-10-10:68432|2024-11-07:68432, 2024-10-23, none
+  Got:      97370.34, affordable_with_plan, installments, 2024-09-12:68432|2024-10-10:68432|2024-11-07:68432, 2024-10-15, none
+[FAIL] request_08
+  Expected: 284.57, affordable_later, wait, 2025-04-15:996.60, 2025-04-15, none
+  Got:      0.0, not_affordable, not_recommended, none, , none
+[PASS] request_09
+[FAIL] request_10
+  Expected: 12700.0, not_affordable, not_recommended, none, , none
+  Got:      266700.0, affordable_later, not_recommended, none, 2024-12-06, none
+[FAIL] request_11
+  Expected: 12510645.0, affordable_with_plan, full_payment, 2025-05-03:13110000, 2025-07-15, reduce_to:event_989:665950
+  Got:      4515888.33, affordable_with_plan, wait, 2025-07-23:13110000, , reduce_to:event_989:665950.0
+[PASS] request_12
+[FAIL] request_13
+  Expected: 433.4, affordable_later, wait, 2024-05-15:941.60, 2024-05-15, none
+  Got:      660.12, affordable_with_plan, wait, 2024-05-15:941.6, , reduce_to:event_1092:30.5
+[FAIL] request_14
+  Expected: 597.74, not_affordable, not_recommended, none, , none
+  Got:      586.38, not_affordable, not_recommended, none, , none
+[FAIL] request_15
+  Expected: 83.05, not_affordable, not_recommended, none, , none
+  Got:      0.0, not_affordable, not_recommended, none, , none
+[PASS] request_16
+[FAIL] request_17
+  Expected: 243849.58, affordable_with_plan, installments, 2026-03-01:95194.67|2026-03-31:95194.67|2026-04-30:95194.67, 2026-03-15, none
+  Got:      263110.37, affordable_with_plan, installments, 2026-03-01:95194.67|2026-03-31:95194.67|2026-04-30:95194.67, 2026-03-15, none
+[FAIL] request_18
+  Expected: 462.0, affordable_later, wait, 2026-09-15:3246.10, 2026-09-15, none
+  Got:      539.39, affordable_later, wait, 2026-09-15:3246.1, 2026-09-15, none
+[FAIL] request_19
+  Expected: 28820.0, affordable_with_plan, partial_payment, 2024-09-04:28820|2024-09-15:10840, 2024-09-15, none
+  Got:      35428.4, affordable_with_plan, partial_payment, 2024-09-04:35428.4|2024-09-15:4231.6, 2024-09-15, none
+[FAIL] request_20
+  Expected: 5400.0, not_affordable, not_recommended, none, , none
+  Got:      12289.51, not_affordable, not_recommended, none, , none
+[FAIL] request_21
+  Expected: 1543.35, affordable_with_plan, full_payment, 2026-04-03:1574.40, 2026-04-15, stop:event_1815|reduce_to:event_1816:23.50
+  Got:      1574.4, affordable_now, full_payment, 2026-04-03:1574.4, 2026-04-03, none
+[FAIL] request_22
+  Expected: 475.46, affordable_with_plan, installments, 2024-12-08:253.59|2025-01-05:253.59|2025-02-02:253.59, 2025-01-15, none
+  Got:      501.85, affordable_with_plan, installments, 2024-12-08:253.59|2025-01-05:253.59|2025-02-02:253.59, 2025-01-15, none
+[FAIL] request_23
+  Expected: 9152.0, affordable_later, wait, 2025-07-15:38016, 2025-07-15, none
+  Got:      10955.51, affordable_later, wait, 2025-07-15:38016, 2025-07-15, none
+[FAIL] request_24
+  Expected: 13420.0, not_affordable, not_recommended, none, , none
+  Got:      15283.1, not_affordable, not_recommended, none, , none
+[FAIL] request_25
+  Expected: 1425000.0, not_affordable, not_recommended, none, , none
+  Got:      0.0, not_affordable, not_recommended, none, , none
+
+Score: 4/25 (16.0%)

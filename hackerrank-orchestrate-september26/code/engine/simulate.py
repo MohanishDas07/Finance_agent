@@ -23,7 +23,7 @@ class Simulator:
         # Group events by date
         events_by_date = {}
         for e in self.ledger:
-            dt = e.settlement_date if e.settlement_date else e.event_date
+            dt = e.settlement_date if e.direction == 'credit' and e.settlement_date else e.event_date
             if not dt: dt = e.event_date
             if dt not in events_by_date:
                 events_by_date[dt] = []

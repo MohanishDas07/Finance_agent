@@ -92,17 +92,17 @@ def _find_cadence(dates):
     if most_common:
         target = most_common[0][0]
         target_count = most_common[0][1]
-        if target_count >= 2:
+        if target_count >= 1:
             filtered_dates = [dates[0]]
             for i in range(1, len(dates)):
                 diff = (dates[i] - filtered_dates[-1]).days
                 if abs(diff - target) <= 3:
                     filtered_dates.append(dates[i])
                 elif diff > target + 5:
-                    if len(filtered_dates) < 3:
+                    if len(filtered_dates) < 2:
                         filtered_dates = [dates[i]]
                         
-            if len(filtered_dates) >= 3:
+            if len(filtered_dates) >= 2:
                 filtered_diffs = [(filtered_dates[i] - filtered_dates[i-1]).days for i in range(1, len(filtered_dates))]
                 if (max(filtered_diffs) - min(filtered_diffs)) <= 5:
                     avg = sum(filtered_diffs) / len(filtered_diffs)
@@ -147,12 +147,21 @@ def detect_and_project_recurrence(
         if cadence_days or cadence_months:
             filtered_dates_set = set(filtered_dates)
             filtered_items = [items[i] for i, d in enumerate(dates) if d in filtered_dates_set]
-            latest_event = filtered_items[-1][1]
+            
+            valid_amts = [i[1].amount for i in filtered_items if i[1].amount is not None]
+            med_amt = statistics.median(valid_amts) if valid_amts else None
+            regular_items = [i for i in filtered_items if i[1].amount is not None and (med_amt is None or i[1].amount <= 2.5 * med_amt)]
+            latest_event = regular_items[-1][1] if regular_items else filtered_items[-1][1]
+            
+            # Check for terminal keywords
+            desc_lower = latest_event.description.lower() if latest_event.description else ""
+            if any(kw in desc_lower for kw in ['final', 'last', 'cancelled', 'closing']):
+                continue
             
             if latest_event.status == 'scheduled' and latest_event.amount is not None:
                 projected_amt = latest_event.amount
             elif latest_event.direction == 'debit':
-                projected_amt = max(i[1].amount for i in filtered_items if i[1].amount is not None)
+                projected_amt = latest_event.amount
             else:
                 if latest_event.category == 'salary':
                     projected_amt = latest_event.amount
